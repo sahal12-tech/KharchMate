@@ -4,6 +4,77 @@
 
 {% block content %}
 
+<style>
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 800px;
+    background: var(--paper-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--paper);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    transition: background 0.2s;
+}
+
+.modal-close:hover {
+    background: var(--border);
+}
+
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+</style>
+
 <section class="hero">
     <div class="hero-inner">
         <div class="hero-badge">Free to use • No credit card needed</div>
@@ -17,7 +88,7 @@
         </p>
         <div class="hero-actions">
             <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
-            <a href="#" class="btn-ghost">See how it works</a>
+            <a href="#" id="open-modal" class="btn-ghost">See how it works</a>
         </div>
     </div>
     <div class="hero-visual">
@@ -96,4 +167,52 @@
     </div>
 </section>
 
+<div id="video-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button id="close-modal" class="modal-close">&times;</button>
+        <div class="video-container">
+            <iframe id="modal-video" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
+<script>
+(function() {
+    const openBtn = document.getElementById('open-modal');
+    const closeBtn = document.getElementById('close-modal');
+    const modal = document.getElementById('video-modal');
+    const video = document.getElementById('modal-video');
+
+    const videoUrl = 'https://www.youtube.com/embed/dQw4w9WgXcQ'; // Placeholder URL
+
+    function openModal() {
+        modal.classList.add('active');
+        video.src = videoUrl;
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        video.src = ''; // Stop video playback by clearing src
+        document.body.style.overflow = '';
+    }
+
+    if (openBtn) {
+        openBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal();
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+    }
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+})();
+</script>
