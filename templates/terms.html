@@ -2,9 +2,52 @@
 
 {% block title %}Terms and Conditions - KharchMate{% endblock %}
 
+{% block head %}
+  {{ super() }}
+  <style>
+/* ------------------------------------------------------------------ */
+/* Content sections                                                   */
+/* ------------------------------------------------------------------ */
+
+.content-section {
+    padding: 5rem 2rem;
+}
+
+.content-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+}
+
+/* Optional: style for terms-specific sections if needed */
+.terms-section {
+    margin-bottom: 3rem;
+}
+
+.terms-section h2 {
+    color: var(--ink);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-display);
+}
+
+.terms-section p {
+    color: var(--ink-muted);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.terms-effective {
+    text-align: center;
+    font-style: italic;
+    color: var(--ink-faint);
+    margin-bottom: 3rem;
+}
+  </style>
+{% endblock %}
+
 {% block content %}
-<section class="terms-page">
-    <div class="terms-inner">
+<section class="content-section">
+    <div class="content-inner">
         <h1>Terms and Conditions</h1>
         <p class="terms-effective">Effective Date: June 15, 2026</p>
 
@@ -41,6 +84,7 @@
             <h2>6. Contact Information</h2>
             <p>If you have any questions about these Terms, please contact us at:</p>
             <p>Email: terms@kharchmate.example</p>
+            <p>phone no. : 03153019948</p>
         </div>
     </div>
 </section>
