@@ -1,8 +1,33 @@
-from flask import Flask, render_template
+import re
+
+import sqlite3
+from flask import Flask, render_template, request
+from werkzeug.security import generate_password_hash
 
 from database.db import get_db, init_db, seed_db
 
 app = Flask(__name__)
+
+EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+# ------------------------------------------------------------------ #
+# Helpers                                                             #
+# ------------------------------------------------------------------ #
+
+def validate_registration(name, email, password):
+    errors = []
+
+    if not name:
+        errors.append("Please enter your name.")
+
+    if not EMAIL_PATTERN.match(email):
+        errors.append("Please enter a valid email address.")
+
+    if len(password) < 8:
+        errors.append("Password must be at least 8 characters long.")
+
+    return errors
 
 
 # ------------------------------------------------------------------ #
@@ -14,9 +39,60 @@ def landing():
     return render_template("landing.html")
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
-    return render_template("register.html")
+    if request.method == "GET":
+        return render_template("register.html")
+
+    name = request.form.get("name", "").strip()
+    email = request.form.get("email", "").strip().lower()
+    password = request.form.get("password", "")
+
+    errors = validate_registration(name, email, password)
+    if errors:
+        return render_template(
+            "register.html",
+            errors=errors,
+            name=name,
+            email=email,
+        )
+
+    with get_db() as conn:
+        existing_user = conn.execute(
+            "SELECT id FROM users WHERE LOWER(email) = LOWER(?)",
+            (email,),
+        ).fetchone()
+
+        if existing_user is not None:
+            return render_template(
+                "register.html",
+                errors=["An account with this email address already exists."],
+                name=name,
+                email=email,
+            )
+
+        password_hash = generate_password_hash(password)
+
+        try:
+            conn.execute(
+                """
+                INSERT INTO users (name, email, password_hash)
+                VALUES (?, ?, ?)
+                """,
+                (name, email, password_hash),
+            )
+        except sqlite3.IntegrityError:
+            return render_template(
+                "register.html",
+                errors=["An account with this email address already exists."],
+                name=name,
+                email=email,
+            )
+
+    return render_template(
+        "register.html",
+        success="Account created successfully. You can now sign in.",
+    )
 
 
 @app.route("/login")
