@@ -118,6 +118,7 @@ something that can be verified by running the app.
 Save to: `.claude/specs/<step_number>-<feature_slug>.md`
 
 ## Step 9 — Report to the user
+
 Print a short summary in this exact format:
 ```
 Branch:    <branch_name>
